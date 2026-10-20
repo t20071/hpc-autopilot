@@ -1,0 +1,12 @@
+[server]
+address = "localhost"   # the dashboard can submit and cancel jobs, so keep it local
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+primaryColor = "#1F64B8"

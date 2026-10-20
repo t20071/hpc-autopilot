@@ -1,0 +1,37 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# runtime data from the Python autopilot
+data/
+
+# web
+web/node_modules/
+web/dist/
+.vercel/
+
+# documents kept out of the code repository
+doc/
+
+outbox/
+runs/
+backups/
+reports/
+
+# Claude Code: share only the project guide, not personal settings, skills or agents
+.claude/*
+!.claude/CLAUDE.md
+
+# user code uploaded through the dashboard
+jobs/uploads/
+
+# misc
+.pytest_cache/
+*.log

@@ -1,0 +1,124 @@
+# HPC Autopilot cluster definition. Restart the scheduler after editing.
+
+[scheduler]
+tick_seconds = 2             # how often the scheduler loop runs
+backfill = true              # let short jobs use idle nodes without delaying the top job
+weight_fairshare = 10000     # priority = fair-share + age + QoS (Slurm-style multifactor)
+weight_age = 1000
+weight_qos = 2000
+age_saturation_minutes = 10  # waiting this long earns the full age bonus
+usage_halflife_hours = 24    # past usage counts half after this long
+gpu_billing_weight = 16      # one GPU-second costs as much as 16 CPU-seconds
+
+# Virtual nodes. On a real cluster these come from slurm.conf.
+[[nodes]]
+name = "gpu01"
+partition = "gpu"
+cpus = 32
+memory_gb = 256
+gpus = 4
+gpu_type = "nvidia-h100"
+
+[[nodes]]
+name = "gpu02"
+partition = "gpu"
+cpus = 32
+memory_gb = 256
+gpus = 4
+gpu_type = "nvidia-h100"
+
+[[nodes]]
+name = "amd01"
+partition = "gpu"
+cpus = 32
+memory_gb = 384
+gpus = 4
+gpu_type = "amd-mi300x"
+
+[[nodes]]
+name = "cpu01"
+partition = "cpu"
+cpus = 64
+memory_gb = 512
+gpus = 0
+gpu_type = ""
+
+# Quality of service per role: a priority bonus (0-100) and per-user limits.
+[qos.student]
+priority = 0
+max_gpus_per_user = 1
+max_running_jobs = 2
+max_time_minutes = 30
+
+[qos.phd]
+priority = 50
+max_gpus_per_user = 2
+max_running_jobs = 4
+max_time_minutes = 120
+
+[qos.faculty]
+priority = 100
+max_gpus_per_user = 4
+max_running_jobs = 6
+max_time_minutes = 240
+
+[qos.startup]
+priority = 25
+max_gpus_per_user = 4
+max_running_jobs = 4
+max_time_minutes = 120
+
+# Fair-share: each account's target share of the cluster.
+[accounts]
+research = 50
+teaching = 30
+startups = 20
+
+[email]
+mode = "outbox"              # "outbox" writes .eml files to ./outbox; "smtp" sends real email
+from = "hpc-autopilot@example.edu"
+admin = "hpc-admin@example.edu"
+smtp_host = "smtp.example.edu"
+smtp_port = 587
+smtp_starttls = true
+smtp_user = ""               # the password is read from the HPC_SMTP_PASSWORD environment variable; login requires STARTTLS
+
+[health]
+gpu_temp_limit_c = 85
+auto_resume = true           # resume nodes drained by health checks once they pass again
+
+[maintenance]
+backup_every_minutes = 60
+backup_keep = 10
+report_every_minutes = 60
+purge_outputs_after_days = 7
+
+[security]
+allow_custom_commands = false   # true lets users run any command, not only scripts in ./jobs
+require_known_users = false     # true: only users listed under [users] may submit
+
+# Registered users. A listed user always gets this role and account, whatever they type at submit time.
+# On a real cluster this comes from LDAP/AD groups and `sacctmgr add user`.
+[users.asha]
+role = "student"
+account = "teaching"
+
+[users.rahul]
+role = "phd"
+account = "research"
+
+[users.lin]
+role = "phd"
+account = "research"
+
+[users.kavya]
+role = "phd"
+account = "research"
+
+[users.prof_mehta]
+role = "faculty"
+account = "research"
+
+[users.neo_ai]
+role = "startup"
+account = "startups"
